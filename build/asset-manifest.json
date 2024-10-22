@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/score-tracker2/static/css/main.103c1e8c.css",
+    "main.js": "/score-tracker2/static/js/main.9c652077.js",
+    "index.html": "/score-tracker2/index.html",
+    "main.103c1e8c.css.map": "/score-tracker2/static/css/main.103c1e8c.css.map",
+    "main.9c652077.js.map": "/score-tracker2/static/js/main.9c652077.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.103c1e8c.css",
+    "static/js/main.9c652077.js"
+  ]
+}
