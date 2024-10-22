@@ -1,60 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#1a1a1a" />
-    <meta name="description" content="Score Tracker App" />
-    
-    <!-- iOS specific meta tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="apple-mobile-web-app-title" content="Score Tracker" />
-    
-    <!-- Icons -->
-    <link rel="icon" href="%PUBLIC_URL%/icon.svg" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
-    
-    <!-- Splash Screen -->
-    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash.png" />
-    
-    <title>Score Tracker</title>
-
-    <style>
-      /* Add safe area padding */
-      body {
-        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-        margin: 0;
-        min-height: 100vh;
-        min-height: -webkit-fill-available;
-      }
-
-      html {
-        min-height: -webkit-fill-available;
-      }
-
+<style>
+    body {
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      margin: 0;
+      min-height: 100vh;
+      min-height: -webkit-fill-available;
+    }
+  
+    html {
+      min-height: -webkit-fill-available;
+    }
+  
+    #root {
+      padding-top: env(safe-area-inset-top);
+      min-height: 100vh;
+    }
+  
+    /* Add more top spacing for iOS */
+    @supports (-webkit-touch-callout: none) {
       #root {
-        padding-top: env(safe-area-inset-top);
+        padding-top: calc(env(safe-area-inset-top) + 2rem);
       }
-
-      /* Splash screen styles */
-      #splash-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-image: url('%PUBLIC_URL%/splash.png');
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-        z-index: 9999;
-      }
-    </style>
-  </head>
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="splash-screen"></div>
-    <div id="root"></div>
-  </body>
-</html>
+    }
+  
+    #splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: url('%PUBLIC_URL%/splash.png');
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: cover;
+      z-index: 9999;
+    }
+  </style>
