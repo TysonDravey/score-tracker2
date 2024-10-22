@@ -133,12 +133,7 @@ function ScoreTracker() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-4" style={{ 
-        paddingTop: 'calc(env(safe-area-inset-top) + 4rem)',  // Increased from 1rem to 4rem
-        paddingBottom: 'env(safe-area-inset-bottom)',
-        paddingLeft: 'env(safe-area-inset-left)',
-        paddingRight: 'env(safe-area-inset-right)'
-      }}>
+    <div className="max-w-2xl mx-auto p-4 space-y-4" style={{ paddingTop: '5rem' }}>
       {/* Home View */}
       {view === 'home' && (
         <>
@@ -387,8 +382,8 @@ function ScoreTracker() {
         </div>
       )}
 
-      {/* Game View */}
-      {view === 'game' && activeGame && (
+    {/* Game View */}
+    {view === 'game' && activeGame && (
         <div className="bg-white rounded-lg shadow p-4">
           <h2 className="text-xl font-bold mb-4">Current Game</h2>
           <div className="space-y-4">
