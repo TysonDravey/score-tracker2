@@ -133,7 +133,7 @@ function ScoreTracker() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-4 space-y-4" style={{ paddingTop: '3rem' }}>
+    <div className="max-w-2xl mx-auto p-4 space-y-4" >
       {/* Home View */}
       {view === 'home' && (
         <>
