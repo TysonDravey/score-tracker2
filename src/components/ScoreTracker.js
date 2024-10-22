@@ -246,58 +246,78 @@ function ScoreTracker() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          // In the player card section of the Players View, replace the current card content with this:
+
             {players.map(player => (
-              <div key={player.id} className="bg-white rounded-lg shadow">
-                <div 
-                  className="p-4 flex flex-col h-full"
-                  style={{ borderLeft: `4px solid ${player.color}` }}
-                >
-                  {editingPlayerId === player.id ? (
-                    <div className="flex items-center gap-2 mb-2">
-                      <input
-                        type="text"
-                        className="flex-grow p-2 border rounded"
-                        value={editingName}
-                        onChange={e => setEditingName(e.target.value)}
-                        onKeyPress={e => {
-                          if (e.key === 'Enter') saveEdit(player.id);
-                        }}
-                        autoFocus
-                      />
-                      <button
-                        onClick={() => saveEdit(player.id)}
-                        className="p-2 text-green-500"
-                      >
-                        <Check className="h-5 w-5" />
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex-grow">
-                      <div className="text-xl font-bold">{player.name}</div>
-                      <div className="text-gray-600">
-                        Wins: {player.wins} / Losses: {player.losses}
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="flex justify-end space-x-2 mt-4 pt-2 border-t">
-                    <button
-                      onClick={() => startEditing(player)}
-                      className="p-2 text-blue-500 hover:bg-blue-50 rounded-full"
-                      title="Edit Name"
+                <div key={player.id} className="bg-white rounded-lg shadow">
+                    <div 
+                    className="p-4 flex flex-col h-full"
+                    style={{ borderLeft: `4px solid ${player.color}` }}
                     >
-                      <Edit2 className="h-5 w-5" />
-                    </button>
-                    <button
-                      onClick={() => removePlayer(player.id)}
-                      className="p-2 text-red-500 hover:bg-red-50 rounded-full"
-                      title="Remove Player"
-                    >
-                      <X className="h-5 w-5" />
-                    </button>
-                  </div>
+                    {editingPlayerId === player.id ? (
+                        <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                            <input
+                            type="text"
+                            className="flex-grow p-2 border rounded"
+                            value={editingName}
+                            onChange={e => setEditingName(e.target.value)}
+                            onKeyPress={e => {
+                                if (e.key === 'Enter') saveEdit(player.id);
+                            }}
+                            autoFocus
+                            placeholder="Player name"
+                            />
+                            <button
+                            onClick={() => saveEdit(player.id)}
+                            className="p-2 text-green-500"
+                            >
+                            <Check className="h-5 w-5" />
+                            </button>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Player Color</label>
+                            <div className="flex items-center gap-2">
+                            <input
+                                type="color"
+                                className="h-8 w-16"
+                                value={player.color}
+                                onChange={e => updatePlayer(player.id, { color: e.target.value })}
+                            />
+                            <div 
+                                className="flex-1 h-8 rounded border"
+                                style={{ backgroundColor: player.color }}
+                            ></div>
+                            </div>
+                        </div>
+                        </div>
+                    ) : (
+                        <div className="flex-grow">
+                        <div className="text-xl font-bold">{player.name}</div>
+                        <div className="text-gray-600">
+                            Wins: {player.wins} / Losses: {player.losses}
+                        </div>
+                        </div>
+                    )}
+                    
+                    <div className="flex justify-end space-x-2 mt-4 pt-2 border-t">
+                        <button
+                        onClick={() => startEditing(player)}
+                        className="p-2 text-blue-500 hover:bg-blue-50 rounded-full"
+                        title="Edit Player"
+                        >
+                        <Edit2 className="h-5 w-5" />
+                        </button>
+                        <button
+                        onClick={() => removePlayer(player.id)}
+                        className="p-2 text-red-500 hover:bg-red-50 rounded-full"
+                        title="Remove Player"
+                        >
+                        <X className="h-5 w-5" />
+                        </button>
+                    </div>
+                    </div>
                 </div>
-              </div>
             ))}
           </div>
 
