@@ -246,8 +246,6 @@ function ScoreTracker() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          // In the player card section of the Players View, replace the current card content with this:
-
             {players.map(player => (
                 <div key={player.id} className="bg-white rounded-lg shadow">
                     <div 
