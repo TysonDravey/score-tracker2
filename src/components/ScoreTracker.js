@@ -422,6 +422,8 @@ function ScoreTracker() {
           </div>
         </div>
       )}
-
+    </div>
+  );
+}
 
 export default ScoreTracker;
