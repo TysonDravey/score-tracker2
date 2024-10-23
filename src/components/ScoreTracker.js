@@ -464,466 +464,498 @@ function ScoreTracker() {
       </button>
     </div>
   );
-const renderNewGame = () => (
-  <div className="bg-white rounded-lg shadow p-4">
-    <h2 className="text-xl font-bold mb-4">
-      {settings.teamMode ? 'Select Teams' : 'Select Players'}
-    </h2>
-    <div className="space-y-4">
-      {settings.teamMode ? (
-        // Team selection interface
-        <>
-          {teams.length < 2 ? (
-            <div className="p-4 border-2 border-dashed rounded text-center text-gray-500">
-              Create at least two teams in Settings to start a team game
+  const renderNewGame = () => (
+    <div className="bg-white rounded-lg shadow p-4">
+      <h2 className="text-xl font-bold mb-4">
+        {settings.teamMode ? "Select Teams" : "Select Players"}
+      </h2>
+      <div className="space-y-4">
+        {settings.teamMode ? (
+          // Team selection interface
+          <>
+            {teams.length < 2 ? (
+              <div className="p-4 border-2 border-dashed rounded text-center text-gray-500">
+                Create at least two teams in Settings to start a team game
+              </div>
+            ) : (
+              teams.map((team) => (
+                <div
+                  key={team.id}
+                  className="p-2 border rounded"
+                  style={{ borderLeft: `4px solid ${team.color}` }}
+                >
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <span className="font-medium">{team.name}</span>
+                      <div className="text-sm text-gray-600">
+                        Players:{" "}
+                        {team.playerIds
+                          .map((id) => players.find((p) => p.id === id)?.name)
+                          .join(", ")}
+                      </div>
+                    </div>
+                    <input
+                      type="checkbox"
+                      className="h-5 w-5"
+                      onChange={(e) => {
+                        const selectedTeams = activeGame?.teams || [];
+                        if (e.target.checked) {
+                          setActiveGame({
+                            ...activeGame,
+                            teams: [...selectedTeams, { ...team, score: 0 }],
+                          });
+                        } else {
+                          setActiveGame({
+                            ...activeGame,
+                            teams: selectedTeams.filter(
+                              (t) => t.id !== team.id
+                            ),
+                          });
+                        }
+                      }}
+                    />
+                  </div>
+                </div>
+              ))
+            )}
+          </>
+        ) : (
+          // Individual player selection interface
+          players.map((player) => (
+            <div
+              key={player.id}
+              className="p-2 border rounded flex items-center justify-between"
+              style={{ borderLeft: `4px solid ${player.color}` }}
+            >
+              <span>{player.name}</span>
+              <input
+                type="checkbox"
+                className="h-5 w-5"
+                onChange={(e) => {
+                  const selectedPlayers = activeGame?.players || [];
+                  if (e.target.checked) {
+                    setActiveGame({
+                      ...activeGame,
+                      players: [...selectedPlayers, { ...player, score: 0 }],
+                    });
+                  } else {
+                    setActiveGame({
+                      ...activeGame,
+                      players: selectedPlayers.filter(
+                        (p) => p.id !== player.id
+                      ),
+                    });
+                  }
+                }}
+              />
             </div>
-          ) : (
-            teams.map(team => (
+          ))
+        )}
+        <div className="flex gap-2">
+          <button
+            onClick={() =>
+              startNewGame(
+                settings.teamMode ? activeGame?.teams : activeGame?.players
+              )
+            }
+            disabled={
+              settings.teamMode
+                ? !activeGame?.teams?.length || activeGame.teams.length < 2
+                : !activeGame?.players?.length
+            }
+            className="flex-1 p-2 text-white rounded disabled:bg-gray-300"
+            style={{ backgroundColor: settings.theme.primary }}
+          >
+            Start Game
+          </button>
+          <button
+            onClick={() => {
+              setActiveGame(null);
+              setView("home");
+            }}
+            className="flex-1 p-2 bg-gray-500 text-white rounded"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
+  //part 3.2
+  const renderGame = () => (
+    <div className="bg-white rounded-lg shadow p-4">
+      <h2 className="text-xl font-bold mb-4">Current Game</h2>
+      <div className="space-y-4">
+        {settings.teamMode
+          ? // Team game interface
+            activeGame?.teams.map((team) => (
               <div
                 key={team.id}
-                className="p-2 border rounded"
+                className="p-4 border rounded"
                 style={{ borderLeft: `4px solid ${team.color}` }}
               >
-                <div className="flex justify-between items-center">
+                <div className="flex items-center justify-between mb-2">
                   <div>
-                    <span className="font-medium">{team.name}</span>
+                    <span className="text-lg font-medium">{team.name}</span>
                     <div className="text-sm text-gray-600">
-                      Players: {team.playerIds.map(id => 
-                        players.find(p => p.id === id)?.name
-                      ).join(', ')}
+                      {team.playerIds
+                        .map((id) => players.find((p) => p.id === id)?.name)
+                        .join(", ")}
                     </div>
                   </div>
-                  <input
-                    type="checkbox"
-                    className="h-5 w-5"
-                    onChange={(e) => {
-                      const selectedTeams = activeGame?.teams || [];
-                      if (e.target.checked) {
-                        setActiveGame({
-                          ...activeGame,
-                          teams: [...selectedTeams, { ...team, score: 0 }]
-                        });
-                      } else {
-                        setActiveGame({
-                          ...activeGame,
-                          teams: selectedTeams.filter(t => t.id !== team.id)
-                        });
-                      }
-                    }}
-                  />
+                  <span className="text-2xl font-bold">{team.score}</span>
+                </div>
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => updateScore(team.id, -1)}
+                    className="p-3 text-white rounded-full"
+                    style={{ backgroundColor: settings.theme.danger }}
+                  >
+                    <Minus className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => updateScore(team.id, 1)}
+                    className="p-3 text-white rounded-full"
+                    style={{ backgroundColor: settings.theme.secondary }}
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
                 </div>
               </div>
             ))
-          )}
-        </>
-      ) : (
-        // Individual player selection interface
-        players.map(player => (
-          <div
-            key={player.id}
-            className="p-2 border rounded flex items-center justify-between"
-            style={{ borderLeft: `4px solid ${player.color}` }}
-          >
-            <span>{player.name}</span>
-            <input
-              type="checkbox"
-              className="h-5 w-5"
-              onChange={(e) => {
-                const selectedPlayers = activeGame?.players || [];
-                if (e.target.checked) {
-                  setActiveGame({
-                    ...activeGame,
-                    players: [...selectedPlayers, { ...player, score: 0 }]
-                  });
-                } else {
-                  setActiveGame({
-                    ...activeGame,
-                    players: selectedPlayers.filter(p => p.id !== player.id)
-                  });
-                }
-              }}
-            />
-          </div>
-        ))
-      )}
-      <div className="flex gap-2">
-        <button
-          onClick={() => startNewGame(
-            settings.teamMode ? activeGame?.teams : activeGame?.players
-          )}
-          disabled={
-            settings.teamMode 
-              ? !activeGame?.teams?.length || activeGame.teams.length < 2
-              : !activeGame?.players?.length
-          }
-          className="flex-1 p-2 text-white rounded disabled:bg-gray-300"
-          style={{ backgroundColor: settings.theme.primary }}
-        >
-          Start Game
-        </button>
-        <button
-          onClick={() => {
-            setActiveGame(null);
-            setView('home');
-          }}
-          className="flex-1 p-2 bg-gray-500 text-white rounded"
-        >
-          Cancel
-        </button>
-      </div>
-    </div>
-  </div>
-);
-
-
-//part 3.2
-const renderGame = () => (
-  <div className="bg-white rounded-lg shadow p-4">
-    <h2 className="text-xl font-bold mb-4">Current Game</h2>
-    <div className="space-y-4">
-      {settings.teamMode ? (
-        // Team game interface
-        activeGame?.teams.map(team => (
-          <div
-            key={team.id}
-            className="p-4 border rounded"
-            style={{ borderLeft: `4px solid ${team.color}` }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div>
-                <span className="text-lg font-medium">{team.name}</span>
-                <div className="text-sm text-gray-600">
-                  {team.playerIds.map(id => 
-                    players.find(p => p.id === id)?.name
-                  ).join(', ')}
+          : // Individual player game interface
+            activeGame?.players.map((player) => (
+              <div
+                key={player.id}
+                className="p-4 border rounded"
+                style={{ borderLeft: `4px solid ${player.color}` }}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-lg font-medium">{player.name}</span>
+                  <span className="text-2xl font-bold">{player.score}</span>
                 </div>
-              </div>
-              <span className="text-2xl font-bold">{team.score}</span>
-            </div>
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => updateScore(team.id, -1)}
-                className="p-3 text-white rounded-full"
-                style={{ backgroundColor: settings.theme.danger }}
-              >
-                <Minus className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => updateScore(team.id, 1)}
-                className="p-3 text-white rounded-full"
-                style={{ backgroundColor: settings.theme.secondary }}
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        ))
-      ) : (
-        // Individual player game interface
-        activeGame?.players.map(player => (
-          <div
-            key={player.id}
-            className="p-4 border rounded"
-            style={{ borderLeft: `4px solid ${player.color}` }}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-lg font-medium">{player.name}</span>
-              <span className="text-2xl font-bold">{player.score}</span>
-            </div>
-            <div className="flex justify-end space-x-2">
-              <button
-                onClick={() => updateScore(player.id, -1)}
-                className="p-3 text-white rounded-full"
-                style={{ backgroundColor: settings.theme.danger }}
-              >
-                <Minus className="h-5 w-5" />
-              </button>
-              <button
-                onClick={() => updateScore(player.id, 1)}
-                className="p-3 text-white rounded-full"
-                style={{ backgroundColor: settings.theme.secondary }}
-              >
-                <Plus className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
-        ))
-      )}
-      <button
-        onClick={endGame}
-        className="w-full p-3 text-white rounded text-lg"
-        style={{ backgroundColor: settings.theme.primary }}
-      >
-        End Game
-      </button>
-    </div>
-  </div>
-);
-
-//part 3.3
-const renderSettings = () => (
-  <div className="space-y-4">
-    <div className="bg-white rounded-lg shadow p-4">
-      <h2 className="text-xl font-bold mb-4">Settings</h2>
-      
-      {/* Scoring Settings Section */}
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-1">Score Increment</label>
-          <select 
-            className="w-full p-2 border rounded"
-            value={settings.scoreIncrement}
-            onChange={e => setSettings(prev => ({
-              ...prev,
-              scoreIncrement: parseInt(e.target.value)
-            }))}
-          >
-            <option value="1">1 Point</option>
-            <option value="2">2 Points</option>
-            <option value="5">5 Points</option>
-            <option value="10">10 Points</option>
-          </select>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="allowNegative"
-            className="h-4 w-4"
-            checked={settings.allowNegativeScores}
-            onChange={e => setSettings(prev => ({
-              ...prev,
-              allowNegativeScores: e.target.checked
-            }))}
-          />
-          <label htmlFor="allowNegative" className="text-sm">
-            Allow Negative Scores
-          </label>
-        </div>
-      </div>
-
-      {/* Game Mode Settings Section */}
-      <div className="mt-6 space-y-4">
-        <h3 className="font-semibold">Game Modes</h3>
-        
-        <div className="flex items-center gap-2">
-          <input
-            type="checkbox"
-            id="teamMode"
-            className="h-4 w-4"
-            checked={settings.teamMode}
-            onChange={e => setSettings(prev => ({
-              ...prev,
-              teamMode: e.target.checked
-            }))}
-          />
-          <label htmlFor="teamMode" className="text-sm">
-            Team Mode
-          </label>
-        </div>
-      </div>
-
-      {/* Team Management Section - Only visible when team mode is enabled */}
-      {settings.teamMode && (
-        <div className="mt-6 space-y-4">
-          <h3 className="font-semibold">Team Management</h3>
-          
-          {/* Add New Team Form */}
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Team Name</label>
-              <input
-                type="text"
-                placeholder="Enter team name"
-                className="w-full p-2 border rounded"
-                value={newTeamName}
-                onChange={e => setNewTeamName(e.target.value)}
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium mb-1">Team Color</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  className="h-10 w-20"
-                  value={newTeamColor}
-                  onChange={e => setNewTeamColor(e.target.value)}
-                />
-                <div 
-                  className="flex-1 h-10 rounded border"
-                  style={{ backgroundColor: newTeamColor }}
-                ></div>
-              </div>
-            </div>
-
-            <button
-              onClick={() => {
-                if (newTeamName.trim()) {
-                  createTeam(newTeamName, newTeamColor);
-                  setNewTeamName('');
-                }
-              }}
-              className="w-full p-2 text-white rounded"
-              style={{ backgroundColor: settings.theme.secondary }}
-              disabled={!newTeamName.trim()}
-            >
-              Add Team
-            </button>
-          </div>
-
-          {/* Existing Teams List */}
-          <div className="space-y-2">
-            {teams.map(team => (
-              <div 
-                key={team.id}
-                className="p-2 border rounded"
-                style={{ borderLeft: `4px solid ${team.color}` }}
-              >
-                <div className="flex justify-between items-center">
-                  <span className="font-medium">{team.name}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-500">
-                      {team.wins}W - {team.losses}L
-                    </span>
-                    <button
-                      onClick={() => removeTeam(team.id)}
-                      className="p-1 rounded-full"
-                      style={{ color: settings.theme.danger }}
-                    >
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-
-                {/* Player Management for Team */}
-                <div className="mt-2">
-                  <select
-                    className="w-full p-1 border rounded"
-                    onChange={e => addPlayerToTeam(e.target.value, team.id)}
-                    value=""
+                <div className="flex justify-end space-x-2">
+                  <button
+                    onClick={() => updateScore(player.id, -1)}
+                    className="p-3 text-white rounded-full"
+                    style={{ backgroundColor: settings.theme.danger }}
                   >
-                    <option value="">Add player to team...</option>
-                    {players
-                      .filter(p => !teams.some(t => t.playerIds.includes(p.id)))
-                      .map(player => (
-                        <option key={player.id} value={player.id}>
-                          {player.name}
-                        </option>
-                      ))
-                    }
-                  </select>
+                    <Minus className="h-5 w-5" />
+                  </button>
+                  <button
+                    onClick={() => updateScore(player.id, 1)}
+                    className="p-3 text-white rounded-full"
+                    style={{ backgroundColor: settings.theme.secondary }}
+                  >
+                    <Plus className="h-5 w-5" />
+                  </button>
                 </div>
-
-                {/* Team Members List */}
-                {team.playerIds.length > 0 && (
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {team.playerIds.map(playerId => {
-                      const player = players.find(p => p.id === playerId);
-                      return player ? (
-                        <span 
-                          key={playerId}
-                          className="px-2 py-1 bg-gray-100 rounded-full text-sm flex items-center gap-1"
-                        >
-                          {player.name}
-                          <button
-                            onClick={() => removePlayerFromTeam(playerId, team.id)}
-                            className="text-gray-500 hover:text-red-500"
-                          >
-                            <X className="h-3 w-3" />
-                          </button>
-                        </span>
-                      ) : null;
-                    })}
-                  </div>
-                )}
               </div>
             ))}
-          </div>
-        </div>
-      )}
+        <button
+          onClick={endGame}
+          className="w-full p-3 text-white rounded text-lg"
+          style={{ backgroundColor: settings.theme.primary }}
+        >
+          End Game
+        </button>
+      </div>
+    </div>
+  );
 
-      {/* Theme Settings Section */}
-      <div className="mt-6 space-y-4">
-        <h3 className="font-semibold">Theme Colors</h3>
-        
-        {/* Primary Color */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Primary Color</label>
+  //part 3.3
+  const renderSettings = () => (
+    <div className="space-y-4">
+      <div className="bg-white rounded-lg shadow p-4">
+        <h2 className="text-xl font-bold mb-4">Settings</h2>
+
+        {/* Scoring Settings Section */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Score Increment
+            </label>
+            <select
+              className="w-full p-2 border rounded"
+              value={settings.scoreIncrement}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  scoreIncrement: parseInt(e.target.value),
+                }))
+              }
+            >
+              <option value="1">1 Point</option>
+              <option value="2">2 Points</option>
+              <option value="5">5 Points</option>
+              <option value="10">10 Points</option>
+            </select>
+          </div>
+
           <div className="flex items-center gap-2">
             <input
-              type="color"
-              className="h-10 w-20"
-              value={settings.theme.primary}
-              onChange={e => setSettings(prev => ({
-                ...prev,
-                theme: {
-                  ...prev.theme,
-                  primary: e.target.value
-                }
-              }))}
+              type="checkbox"
+              id="allowNegative"
+              className="h-4 w-4"
+              checked={settings.allowNegativeScores}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  allowNegativeScores: e.target.checked,
+                }))
+              }
             />
-            <div 
-              className="flex-1 h-10 rounded border"
-              style={{ backgroundColor: settings.theme.primary }}
-            ></div>
+            <label htmlFor="allowNegative" className="text-sm">
+              Allow Negative Scores
+            </label>
           </div>
         </div>
 
-        {/* Secondary Color */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Secondary Color</label>
+        {/* Game Mode Settings Section */}
+        <div className="mt-6 space-y-4">
+          <h3 className="font-semibold">Game Modes</h3>
+
           <div className="flex items-center gap-2">
             <input
-              type="color"
-              className="h-10 w-20"
-              value={settings.theme.secondary}
-              onChange={e => setSettings(prev => ({
-                ...prev,
-                theme: {
-                  ...prev.theme,
-                  secondary: e.target.value
-                }
-              }))}
+              type="checkbox"
+              id="teamMode"
+              className="h-4 w-4"
+              checked={settings.teamMode}
+              onChange={(e) =>
+                setSettings((prev) => ({
+                  ...prev,
+                  teamMode: e.target.checked,
+                }))
+              }
             />
-            <div 
-              className="flex-1 h-10 rounded border"
-              style={{ backgroundColor: settings.theme.secondary }}
-            ></div>
+            <label htmlFor="teamMode" className="text-sm">
+              Team Mode
+            </label>
           </div>
         </div>
 
-        {/* Danger Color */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Danger Color</label>
-          <div className="flex items-center gap-2">
-            <input
-              type="color"
-              className="h-10 w-20"
-              value={settings.theme.danger}
-              onChange={e => setSettings(prev => ({
-                ...prev,
-                theme: {
-                  ...prev.theme,
-                  danger: e.target.value
+        {/* Team Management Section - Only visible when team mode is enabled */}
+        {settings.teamMode && (
+          <div className="mt-6 space-y-4">
+            <h3 className="font-semibold">Team Management</h3>
+
+            {/* Add New Team Form */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Team Name
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter team name"
+                  className="w-full p-2 border rounded"
+                  value={newTeamName}
+                  onChange={(e) => setNewTeamName(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Team Color
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="color"
+                    className="h-10 w-20"
+                    value={newTeamColor}
+                    onChange={(e) => setNewTeamColor(e.target.value)}
+                  />
+                  <div
+                    className="flex-1 h-10 rounded border"
+                    style={{ backgroundColor: newTeamColor }}
+                  ></div>
+                </div>
+              </div>
+
+              <button
+                onClick={() => {
+                  if (newTeamName.trim()) {
+                    createTeam(newTeamName, newTeamColor);
+                    setNewTeamName("");
+                  }
+                }}
+                className="w-full p-2 text-white rounded"
+                style={{ backgroundColor: settings.theme.secondary }}
+                disabled={!newTeamName.trim()}
+              >
+                Add Team
+              </button>
+            </div>
+
+            {/* Existing Teams List */}
+            <div className="space-y-2">
+              {teams.map((team) => (
+                <div
+                  key={team.id}
+                  className="p-2 border rounded"
+                  style={{ borderLeft: `4px solid ${team.color}` }}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">{team.name}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-500">
+                        {team.wins}W - {team.losses}L
+                      </span>
+                      <button
+                        onClick={() => removeTeam(team.id)}
+                        className="p-1 rounded-full"
+                        style={{ color: settings.theme.danger }}
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Player Management for Team */}
+                  <div className="mt-2">
+                    <select
+                      className="w-full p-1 border rounded"
+                      onChange={(e) => addPlayerToTeam(e.target.value, team.id)}
+                      value=""
+                    >
+                      <option value="">Add player to team...</option>
+                      {players
+                        .filter(
+                          (p) => !teams.some((t) => t.playerIds.includes(p.id))
+                        )
+                        .map((player) => (
+                          <option key={player.id} value={player.id}>
+                            {player.name}
+                          </option>
+                        ))}
+                    </select>
+                  </div>
+
+                  {/* Team Members List */}
+                  {team.playerIds.length > 0 && (
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {team.playerIds.map((playerId) => {
+                        const player = players.find((p) => p.id === playerId);
+                        return player ? (
+                          <span
+                            key={playerId}
+                            className="px-2 py-1 bg-gray-100 rounded-full text-sm flex items-center gap-1"
+                          >
+                            {player.name}
+                            <button
+                              onClick={() =>
+                                removePlayerFromTeam(playerId, team.id)
+                              }
+                              className="text-gray-500 hover:text-red-500"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </span>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Theme Settings Section */}
+        <div className="mt-6 space-y-4">
+          <h3 className="font-semibold">Theme Colors</h3>
+
+          {/* Primary Color */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Primary Color
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                className="h-10 w-20"
+                value={settings.theme.primary}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    theme: {
+                      ...prev.theme,
+                      primary: e.target.value,
+                    },
+                  }))
                 }
-              }))}
-            />
-            <div 
-              className="flex-1 h-10 rounded border"
-              style={{ backgroundColor: settings.theme.danger }}
-            ></div>
+              />
+              <div
+                className="flex-1 h-10 rounded border"
+                style={{ backgroundColor: settings.theme.primary }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Secondary Color */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Secondary Color
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                className="h-10 w-20"
+                value={settings.theme.secondary}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    theme: {
+                      ...prev.theme,
+                      secondary: e.target.value,
+                    },
+                  }))
+                }
+              />
+              <div
+                className="flex-1 h-10 rounded border"
+                style={{ backgroundColor: settings.theme.secondary }}
+              ></div>
+            </div>
+          </div>
+
+          {/* Danger Color */}
+          <div>
+            <label className="block text-sm font-medium mb-1">
+              Danger Color
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="color"
+                className="h-10 w-20"
+                value={settings.theme.danger}
+                onChange={(e) =>
+                  setSettings((prev) => ({
+                    ...prev,
+                    theme: {
+                      ...prev.theme,
+                      danger: e.target.value,
+                    },
+                  }))
+                }
+              />
+              <div
+                className="flex-1 h-10 rounded border"
+                style={{ backgroundColor: settings.theme.danger }}
+              ></div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    {/* Back Button */}
-    <button
-      onClick={() => setView('home')}
-      className="w-full p-2 bg-gray-500 text-white rounded"
-    >
-      Back to Home
-    </button>
-  </div>
-);
+      {/* Back Button */}
+      <button
+        onClick={() => setView("home")}
+        className="w-full p-2 bg-gray-500 text-white rounded"
+      >
+        Back to Home
+      </button>
+    </div>
+  );
+}
