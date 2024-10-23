@@ -149,57 +149,133 @@ function ScoreTracker() {
 
   // Game Management Functions
   const startNewGame = (selectedPlayers) => {
-    setActiveGame({
-      id: Date.now(),
-      players: selectedPlayers.map((p) => ({
-        ...p,
-        score: 0,
-      })),
-      timestamp: new Date(),
-    });
+    if (settings.teamMode) {
+      // For team mode, use the teams directly
+      setActiveGame({
+        id: Date.now(),
+        teams: selectedPlayers.map((team) => ({
+          ...team,
+          score: 0,
+        })),
+        timestamp: new Date(),
+        isTeamGame: true,
+      });
+    } else {
+      // For player mode, use players
+      setActiveGame({
+        id: Date.now(),
+        players: selectedPlayers.map((player) => ({
+          ...player,
+          score: 0,
+        })),
+        timestamp: new Date(),
+        isTeamGame: false,
+      });
+    }
     setView("game");
   };
 
-  const updateScore = (playerId, increment) => {
-    setActiveGame((prev) => ({
-      ...prev,
-      players: prev.players.map((p) =>
-        p.id === playerId
-          ? {
-              ...p,
-              score: settings.allowNegativeScores
-                ? p.score + increment * settings.scoreIncrement
-                : Math.max(0, p.score + increment * settings.scoreIncrement),
-            }
-          : p
-      ),
-    }));
+  const updateScore = (id, increment) => {
+    if (settings.teamMode) {
+      setActiveGame((prev) => ({
+        ...prev,
+        teams: prev.teams.map((team) =>
+          team.id === id
+            ? {
+                ...team,
+                score: settings.allowNegativeScores
+                  ? (team.score || 0) + increment * settings.scoreIncrement
+                  : Math.max(
+                      0,
+                      (team.score || 0) + increment * settings.scoreIncrement
+                    ),
+              }
+            : team
+        ),
+      }));
+    } else {
+      setActiveGame((prev) => ({
+        ...prev,
+        players: prev.players.map((player) =>
+          player.id === id
+            ? {
+                ...player,
+                score: settings.allowNegativeScores
+                  ? player.score + increment * settings.scoreIncrement
+                  : Math.max(
+                      0,
+                      player.score + increment * settings.scoreIncrement
+                    ),
+              }
+            : player
+        ),
+      }));
+    }
   };
 
   const endGame = () => {
-    if (!activeGame?.players?.length) return;
+    if (settings.teamMode) {
+      if (!activeGame?.teams?.length) return;
 
-    const winner = activeGame.players.reduce((prev, current) =>
-      prev.score > current.score ? prev : current
-    );
+      const winner = activeGame.teams.reduce((prev, current) =>
+        prev.score > current.score ? prev : current
+      );
 
-    setPlayers((prevPlayers) =>
-      prevPlayers.map((p) => {
-        const isWinner = p.id === winner.id;
-        const inGame = activeGame.players.some((gp) => gp.id === p.id);
-        if (!inGame) return p;
-        return {
-          ...p,
-          wins: isWinner ? p.wins + 1 : p.wins,
-          losses: !isWinner ? p.losses + 1 : p.losses,
-        };
-      })
-    );
+      setTeams((prevTeams) =>
+        prevTeams.map((team) => {
+          const isWinner = team.id === winner.id;
+          const inGame = activeGame.teams.some((gt) => gt.id === team.id);
+          if (!inGame) return team;
+          return {
+            ...team,
+            wins: isWinner ? team.wins + 1 : team.wins,
+            losses: !isWinner ? team.losses + 1 : team.losses,
+          };
+        })
+      );
 
-    setGames((prev) => [...prev, { ...activeGame, winnerId: winner.id }]);
+      setGames((prev) => [
+        ...prev,
+        {
+          ...activeGame,
+          winnerTeamId: winner.id,
+          isTeamGame: true,
+        },
+      ]);
+    } else {
+      if (!activeGame?.players?.length) return;
+
+      const winner = activeGame.players.reduce((prev, current) =>
+        prev.score > current.score ? prev : current
+      );
+
+      setPlayers((prevPlayers) =>
+        prevPlayers.map((p) => {
+          const isWinner = p.id === winner.id;
+          const inGame = activeGame.players.some((gp) => gp.id === p.id);
+          if (!inGame) return p;
+          return {
+            ...p,
+            wins: isWinner ? p.wins + 1 : p.wins,
+            losses: !isWinner ? p.losses + 1 : p.losses,
+          };
+        })
+      );
+
+      setGames((prev) => [
+        ...prev,
+        {
+          ...activeGame,
+          winnerId: winner.id,
+          isTeamGame: false,
+        },
+      ]);
+    }
+
     setActiveGame(null);
     setView("home");
   };
+
   const createTeam = (name, color) => {
     setTeams([
       ...teams,
@@ -312,10 +388,17 @@ function ScoreTracker() {
               .map((game) => (
                 <div key={game.id} className="p-2 border rounded">
                   <div className="font-medium">
-                    Winner: {players.find((p) => p.id === game.winnerId)?.name}
+                    Winner:{" "}
+                    {game.isTeamGame
+                      ? teams.find((t) => t.id === game.winnerTeamId)?.name
+                      : players.find((p) => p.id === game.winnerId)?.name}
                   </div>
                   <div className="text-sm text-gray-600">
-                    Players: {game.players.map((p) => p.name).join(", ")}
+                    {game.isTeamGame ? (
+                      <>Teams: {game.teams.map((t) => t.name).join(", ")}</>
+                    ) : (
+                      <>Players: {game.players.map((p) => p.name).join(", ")}</>
+                    )}
                   </div>
                   <div className="text-xs text-gray-400">
                     {new Date(game.timestamp).toLocaleDateString()}
@@ -588,8 +671,8 @@ function ScoreTracker() {
       <h2 className="text-xl font-bold mb-4">Current Game</h2>
       <div className="space-y-4">
         {settings.teamMode
-          ? // Team game interface
-            activeGame?.teams.map((team) => (
+          ? // Make sure we're accessing activeGame.teams for team mode
+            activeGame?.teams?.map((team) => (
               <div
                 key={team.id}
                 className="p-4 border rounded"
@@ -604,7 +687,7 @@ function ScoreTracker() {
                         .join(", ")}
                     </div>
                   </div>
-                  <span className="text-2xl font-bold">{team.score}</span>
+                  <span className="text-2xl font-bold">{team.score || 0}</span>
                 </div>
                 <div className="flex justify-end space-x-2">
                   <button
@@ -624,8 +707,8 @@ function ScoreTracker() {
                 </div>
               </div>
             ))
-          : // Individual player game interface
-            activeGame?.players.map((player) => (
+          : // Regular player mode remains the same
+            activeGame?.players?.map((player) => (
               <div
                 key={player.id}
                 className="p-4 border rounded"
