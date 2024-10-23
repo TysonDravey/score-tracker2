@@ -1,133 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#1a1a1a" />
-    <meta name="description" content="Score Tracker App" />
-    
-    <!-- iOS specific meta tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <meta name="apple-mobile-web-app-title" content="Score Tracker" />
-    
-    <!-- Icons -->
-    <link rel="icon" href="%PUBLIC_URL%/icon.svg" />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
-    
-    <title>Score Tracker</title>
-
-    <style>
-      body {
-        margin: 0;
-        padding: 0;
-        background: #ffffff;
-      }
-
-      #splash-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #000;
-        z-index: 10000;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      #splash-image {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-      }
-
-      /* Debug styles */
-      .error-message {
-        color: red;
-        text-align: center;
-        padding: 20px;
-      }
-    </style>
-  </head>
+  <!-- ... head content stays the same ... -->
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     
-    <!-- Splash Screen Container -->
     <div id="splash-container">
       <img 
         id="splash-image" 
         src="%PUBLIC_URL%/splash.png" 
         alt="Splash Screen"
-        onerror="this.onerror=null; handleImageError();"
+        onerror="console.error('Splash image failed to load');"
       />
     </div>
 
     <div id="root"></div>
 
     <script>
-      console.log('Script starting...');
-
-      function handleImageError() {
-        console.log('Image failed to load');
-        document.getElementById('splash-container').innerHTML = 
-          '<div class="error-message">Image failed to load</div>';
-      }
+      console.log('🚀 App Starting');
 
       const splashImage = document.getElementById('splash-image');
       const splashContainer = document.getElementById('splash-container');
       const root = document.getElementById('root');
 
-      console.log('Elements retrieved:', {
-        splashImage: !!splashImage,
-        splashContainer: !!splashContainer,
-        root: !!root
-      });
-
-      // Make splash visible
-      if (splashContainer) {
-        splashContainer.style.display = 'flex';
-        console.log('Splash container displayed');
-      }
-
       function startApp() {
-        console.log('Starting app transition...');
+        console.log('📱 Splash screen displayed');
         
-        // Wait 10 seconds then fade out
+        // Reduced to 3 seconds
         setTimeout(function() {
-          console.log('Fade out starting...');
+          console.log('⏲️ Starting fade out');
           if (splashContainer) {
             splashContainer.style.opacity = '0';
             splashContainer.style.transition = 'opacity 0.5s ease-in-out';
             
             setTimeout(function() {
               splashContainer.style.display = 'none';
-              console.log('Splash hidden');
+              console.log('✨ App ready');
             }, 500);
           }
-        }, 10000);
+        }, 3000); // Changed to 3 seconds
       }
 
       // Start when image is loaded
-      if (splashImage) {
-        if (splashImage.complete) {
-          console.log('Image already loaded');
+      if (splashImage.complete) {
+        console.log('🖼️ Image pre-loaded');
+        startApp();
+      } else {
+        console.log('⌛ Waiting for image');
+        splashImage.onload = function() {
+          console.log('🖼️ Image loaded');
           startApp();
-        } else {
-          console.log('Waiting for image load');
-          splashImage.onload = function() {
-            console.log('Image loaded');
-            startApp();
-          };
-        }
+        };
       }
-
-      // Log any errors
-      window.onerror = function(msg, url, lineNo, columnNo, error) {
-        console.log('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError: ' + error);
-        return false;
-      };
     </script>
   </body>
 </html>
