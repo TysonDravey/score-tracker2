@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/score-tracker2/static/css/main.1155dd45.css",
-    "main.js": "/score-tracker2/static/js/main.1e462abd.js",
+    "main.js": "/score-tracker2/static/js/main.83f8a21a.js",
     "index.html": "/score-tracker2/index.html",
     "main.1155dd45.css.map": "/score-tracker2/static/css/main.1155dd45.css.map",
-    "main.1e462abd.js.map": "/score-tracker2/static/js/main.1e462abd.js.map"
+    "main.83f8a21a.js.map": "/score-tracker2/static/js/main.83f8a21a.js.map"
   },
   "entrypoints": [
     "static/css/main.1155dd45.css",
-    "static/js/main.1e462abd.js"
+    "static/js/main.83f8a21a.js"
   ]
 }
