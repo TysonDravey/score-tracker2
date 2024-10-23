@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Users, Trophy, User, Plus, Minus, X, Edit2, Check } from 'lucide-react';
 
 function ScoreTracker() {
+  console.log('ScoreTracker component mounted');
   // State definitions
   const [view, setView] = useState('home');
   const [players, setPlayers] = useState(() => {
