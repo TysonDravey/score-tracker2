@@ -15,13 +15,51 @@
     <link rel="icon" href="%PUBLIC_URL%/icon.svg" />
     <link rel="apple-touch-icon" href="%PUBLIC_URL%/apple-touch-icon.png" />
     
-    <!-- Splash Screen -->
-    <link rel="apple-touch-startup-image" href="%PUBLIC_URL%/splash.png" />
-    
     <title>Score Tracker</title>
+
+    <style>
+      #splash-screen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('%PUBLIC_URL%/splash.png') no-repeat center center;
+        background-size: cover;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.5s ease-in-out;
+      }
+
+      .hide-splash {
+        opacity: 0 !important;
+        pointer-events: none;
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="splash-screen"></div>
     <div id="root"></div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        const splash = document.getElementById('splash-screen');
+        
+        // Force splash to be visible initially
+        splash.style.display = 'block';
+        splash.style.opacity = '1';
+        
+        // After 10 seconds, hide the splash screen
+        setTimeout(function() {
+          splash.classList.add('hide-splash');
+          
+          // Remove the element after fade out
+          setTimeout(function() {
+            splash.style.display = 'none';
+          }, 500);
+        }, 10000); // 10 seconds
+      });
+    </script>
   </body>
 </html>
