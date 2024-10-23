@@ -18,48 +18,84 @@
     <title>Score Tracker</title>
 
     <style>
-      #splash-screen {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: url('%PUBLIC_URL%/splash.png') no-repeat center center;
-        background-size: cover;
-        z-index: 9999;
-        opacity: 1;
+      body {
+        margin: 0;
+        padding: 0;
+      }
+
+      #root {
+        opacity: 0;
         transition: opacity 0.5s ease-in-out;
       }
 
-      .hide-splash {
-        opacity: 0 !important;
-        pointer-events: none;
+      #root.show {
+        opacity: 1;
+      }
+
+      #splash-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #000;
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #splash-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
       }
     </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="splash-screen"></div>
+    
+    <!-- Splash Screen Container -->
+    <div id="splash-container">
+      <img id="splash-image" src="%PUBLIC_URL%/splash.png" alt="Splash Screen" />
+    </div>
+
     <div id="root"></div>
 
     <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const splash = document.getElementById('splash-screen');
+      // Wait for everything to load
+      window.addEventListener('load', function() {
+        const splashContainer = document.getElementById('splash-container');
+        const root = document.getElementById('root');
         
-        // Force splash to be visible initially
-        splash.style.display = 'block';
-        splash.style.opacity = '1';
+        // Force the splash to be visible
+        splashContainer.style.display = 'flex';
         
-        // After 10 seconds, hide the splash screen
+        // Hide root content initially
+        root.style.opacity = '0';
+        
+        // After 10 seconds
         setTimeout(function() {
-          splash.classList.add('hide-splash');
+          // Show the main content
+          root.classList.add('show');
           
-          // Remove the element after fade out
+          // Start fade out of splash
+          splashContainer.style.opacity = '0';
+          splashContainer.style.transition = 'opacity 0.5s ease-in-out';
+          
+          // Remove splash after fade
           setTimeout(function() {
-            splash.style.display = 'none';
+            splashContainer.style.display = 'none';
           }, 500);
         }, 10000); // 10 seconds
       });
+
+      // Prevent default touch behaviors
+      document.addEventListener('touchmove', function(e) {
+        if (document.getElementById('splash-container').style.display !== 'none') {
+          e.preventDefault();
+        }
+      }, { passive: false });
     </script>
   </body>
 </html>
