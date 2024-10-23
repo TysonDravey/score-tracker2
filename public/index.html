@@ -21,15 +21,7 @@
       body {
         margin: 0;
         padding: 0;
-      }
-
-      #root {
-        opacity: 0;
-        transition: opacity 0.5s ease-in-out;
-      }
-
-      #root.show {
-        opacity: 1;
+        background: #ffffff;
       }
 
       #splash-container {
@@ -48,7 +40,14 @@
       #splash-image {
         width: 100%;
         height: 100%;
-        object-fit: contain;
+        object-fit: cover;
+      }
+
+      /* Debug styles */
+      .error-message {
+        color: red;
+        text-align: center;
+        padding: 20px;
       }
     </style>
   </head>
@@ -57,45 +56,78 @@
     
     <!-- Splash Screen Container -->
     <div id="splash-container">
-      <img id="splash-image" src="%PUBLIC_URL%/splash.png" alt="Splash Screen" />
+      <img 
+        id="splash-image" 
+        src="%PUBLIC_URL%/splash.png" 
+        alt="Splash Screen"
+        onerror="this.onerror=null; handleImageError();"
+      />
     </div>
 
     <div id="root"></div>
 
     <script>
-      // Wait for everything to load
-      window.addEventListener('load', function() {
-        const splashContainer = document.getElementById('splash-container');
-        const root = document.getElementById('root');
-        
-        // Force the splash to be visible
-        splashContainer.style.display = 'flex';
-        
-        // Hide root content initially
-        root.style.opacity = '0';
-        
-        // After 10 seconds
-        setTimeout(function() {
-          // Show the main content
-          root.classList.add('show');
-          
-          // Start fade out of splash
-          splashContainer.style.opacity = '0';
-          splashContainer.style.transition = 'opacity 0.5s ease-in-out';
-          
-          // Remove splash after fade
-          setTimeout(function() {
-            splashContainer.style.display = 'none';
-          }, 500);
-        }, 10000); // 10 seconds
+      console.log('Script starting...');
+
+      function handleImageError() {
+        console.log('Image failed to load');
+        document.getElementById('splash-container').innerHTML = 
+          '<div class="error-message">Image failed to load</div>';
+      }
+
+      const splashImage = document.getElementById('splash-image');
+      const splashContainer = document.getElementById('splash-container');
+      const root = document.getElementById('root');
+
+      console.log('Elements retrieved:', {
+        splashImage: !!splashImage,
+        splashContainer: !!splashContainer,
+        root: !!root
       });
 
-      // Prevent default touch behaviors
-      document.addEventListener('touchmove', function(e) {
-        if (document.getElementById('splash-container').style.display !== 'none') {
-          e.preventDefault();
+      // Make splash visible
+      if (splashContainer) {
+        splashContainer.style.display = 'flex';
+        console.log('Splash container displayed');
+      }
+
+      function startApp() {
+        console.log('Starting app transition...');
+        
+        // Wait 10 seconds then fade out
+        setTimeout(function() {
+          console.log('Fade out starting...');
+          if (splashContainer) {
+            splashContainer.style.opacity = '0';
+            splashContainer.style.transition = 'opacity 0.5s ease-in-out';
+            
+            setTimeout(function() {
+              splashContainer.style.display = 'none';
+              console.log('Splash hidden');
+            }, 500);
+          }
+        }, 10000);
+      }
+
+      // Start when image is loaded
+      if (splashImage) {
+        if (splashImage.complete) {
+          console.log('Image already loaded');
+          startApp();
+        } else {
+          console.log('Waiting for image load');
+          splashImage.onload = function() {
+            console.log('Image loaded');
+            startApp();
+          };
         }
-      }, { passive: false });
+      }
+
+      // Log any errors
+      window.onerror = function(msg, url, lineNo, columnNo, error) {
+        console.log('Error: ' + msg + '\nURL: ' + url + '\nLine: ' + lineNo + '\nColumn: ' + columnNo + '\nError: ' + error);
+        return false;
+      };
     </script>
   </body>
 </html>
