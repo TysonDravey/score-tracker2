@@ -43,14 +43,11 @@
     <title>Score Tracker</title>
 
     <style>
-      html {
-        touch-action: manipulation;
-        -webkit-text-size-adjust: 100%;
-      }
-
+      html,
       body {
         margin: 0;
         padding: 0;
+        background-color: #000000;
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         user-select: none;
@@ -60,17 +57,15 @@
       #root {
         min-height: 100vh;
         min-height: -webkit-fill-available;
-        background-color: #fff;
-        padding-bottom: env(safe-area-inset-bottom);
+        background-color: #ffffff;
         padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
       }
 
-      /* Handle iPhone notch and safe areas */
-      @supports (padding: max(0px)) {
-        #root {
-          padding-left: max(1rem, env(safe-area-inset-left));
-          padding-right: max(1rem, env(safe-area-inset-right));
-        }
+      /* Remove the side padding */
+      .max-w-2xl {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
       }
 
       /* Splash screen styles */
@@ -80,7 +75,8 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background: url("%PUBLIC_URL%/splash.png") no-repeat center center; /* Updated path */
+        background: #000000 url("%PUBLIC_URL%/splash.png") no-repeat center
+          center;
         background-size: cover;
         z-index: 9999;
         transition: opacity 0.5s ease-in-out;
